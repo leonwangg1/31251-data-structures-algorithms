@@ -307,6 +307,8 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id)
 	vector<vertex<T>> visited_vertex;
 	bool visited[adj_matrix.size()];
 
+	//cout << adj_matrix[1][2]; //row i and column j return weight of 10
+
     for (unsigned i = 0; i<adj_matrix.size(); i++) // Intialise all vertices in the matrix to not visited or un visited.
     	{
         visited[i] = false;
@@ -332,6 +334,15 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id)
                 }
             }
         }
+		if(unprocessed.empty()){
+			for (int i=1;i<adj_matrix.size();i++){
+				for(int j=1;j<adj_matrix.size();j++){
+					if(adj_matrix[i][j] > 0 && visited[i] == false){
+						unprocessed.push(i);
+					}
+				}
+			}
+		}
     }
 	return visited_vertex;
 }
