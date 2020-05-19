@@ -34,12 +34,15 @@ class directed_graph {
 private:
 	vector<vector<T>> adj_matrix; // dj_matrix[u_id][v_id] = the weight for edge (u_id, u_id).
 	vector<T> vertex_weights; // vertex_weights[u_id] stores the weight of vertex u_id.
+	int edgeCount = 0;
 
 public:
 
 	directed_graph(); //A constructor for directed_graph. The graph should start empty.
 	~directed_graph(); //A destructor. Depending on how you do things, this may not be necessary.
 	
+	int get_index(const T&) const; // gets the vertex's index within the adjacency matrix
+
 	void increaseCapacity();
 
 	bool contains(const int&) const; //Returns true if the graph contains the given vertex_id, false otherwise.
@@ -160,6 +163,7 @@ template <typename T>
 void directed_graph<T>::add_edge(const int& u_id, const int& v_id, const T& edge_weight) {
 	if(contains(u_id) && contains(v_id)){ // check if the vertices are in the graph
 		adj_matrix[u_id][v_id] = edge_weight; // this demo requires edge_weight != 0
+		edgeCount += 1;
 	}
 }
 
@@ -172,14 +176,27 @@ template <typename T>
 void directed_graph<T>::remove_edge(const int& u_id, const int& v_id) {
 	if(contains(u_id) && contains(v_id)){ // check if the vertices are in the graph
 		adj_matrix[u_id][v_id] = 0; // this demo requires edge_weight != 0
+		edgeCount -= 1;
 	}
 }
 
 template <typename T>
-size_t directed_graph<T>::in_degree(const int& u_id) const { return 0; }
+size_t directed_graph<T>::in_degree(const int& u_id) const { 
+	int total_in=0;
+	if(contains(u_id)){
+		for(int i=0;i<adj_matrix[u_id].size();i++){ //how much columns does row u_id contain?
+			//cout << adj_matrix[u_id][i] << endl;
+			if(adj_matrix[i][u_id] > 0){ //adj_matrix at row u_id and i column
+				total_in = total_in + 1;
+			}
+		}
+	return total_in;
+	}
+	return 0;
+ }
 
 template <typename T>
-size_t directed_graph<T>::out_degree(const int& u_id) const { 
+size_t directed_graph<T>::out_degree(const int& u_id) const { //referencing get neighbors concept
 	int total_out=0;
 	if(contains(u_id)){
 		for(int i=0;i<adj_matrix[u_id].size();i++){ //how much columns does row u_id contain?
@@ -194,7 +211,9 @@ size_t directed_graph<T>::out_degree(const int& u_id) const {
  }
 
 template <typename T>
-size_t directed_graph<T>::degree(const int& u_id) const { return 0; }
+size_t directed_graph<T>::degree(const int& u_id) const { 
+	return in_degree(u_id)+out_degree(u_id); 
+}
 
 template <typename T>
 size_t directed_graph<T>::num_vertices() const { 
@@ -209,8 +228,7 @@ size_t directed_graph<T>::num_vertices() const {
 
 template <typename T>
 size_t directed_graph<T>::num_edges() const { 
-	int n = num_vertices();
-	return n * (n-1)/2;
+	return edgeCount;
 }
 
 template <typename T>
@@ -230,32 +248,68 @@ vector<vertex<T>> directed_graph<T>::get_vertices() {
 template <typename T>
 vector<vertex<T>> directed_graph<T>::get_neighbours(const int& u_id) {
 	vector<vertex<T>> result;
+	vector<vertex<T>> dup;
 	if(contains(u_id)){ // first make sure the vertex is in the graph
 		for (int i=0; i<adj_matrix[u_id].size(); i++){
-			if(adj_matrix[u_id][i] > 0){ // check if there is an edge
-				result.push_back(vertex<T>(i, vertex_weights[i]));
+			if(adj_matrix[u_id][i] > 0){ // check if there is an edge in that row every column
+					dup.push_back(vertex<T>(i, vertex_weights[i]));
 			}
 		}
+		//check for duplicates
+	  int pos = 0;
+		for (vertex<T> a : dup){
+			if(a.id == u_id){
+				dup.erase (dup.begin()+pos);
+			}
+			pos +=1;
+			result = dup;
+		} 
 	}
+	result = dup;
 	return result;
 }
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::get_second_order_neighbours(const int& u_id) { 
-	vector<vertex<double>> second_neighbour_list;
-	vector<vertex<double>> second_neighbour_list_part;
-	vector<vertex<double>> neighbour_list = get_neighbours(u_id);
+
+	/*vector<vertex<T>> first_neighbour = get_neighbours(u_id);
+	vector<vertex<T>> second_neighbour_list;
+	vector<vertex<T>> result_list;
+
 	if(contains(u_id)){ //check if vertex exists
-		for(vertex<double> nb : neighbour_list){ //for each neighbour vertex id, get the neighbour of that vertex id
-				vector<vertex<double>> second_neighbour_list_part = get_neighbours(nb.id); //return vector<vertex> of second order neighbour of that neighbour id and go next 
-				for(vertex<double> yb : second_neighbour_list_part){ 
-					if(yb.id != u_id){
-					second_neighbour_list.push_back(vertex<T>(yb.id, yb.weight));
-					}
+		for(vertex<T> nb : first_neighbour){ //for each elemnt of the first order neighbour list...
+				vector<vertex<T>> second_neighbour_list = get_neighbours(nb.id); //get the neighbour(s) of the element neighbour to achieve second order neighbour
+				for(vertex<T> yb : second_neighbour_list){ //iterate through elements of the second order neighbour list and push it in result list
+					if (yb.id != u_id){ //vertex id cannot be second order neighbour of itself
+						result_list.push_back(vertex<T>(yb.id, yb.weight));
 				}
+			}
 		}
 	}
-	return second_neighbour_list; 
+	return result_list;*/
+
+	vector<vertex<T>> first_orders = get_neighbours(u_id);
+	vector<vertex<T>> second_orders;
+
+	for (auto x: first_orders) {
+		for (int i=0; i<adj_matrix[x.id].size();i++){
+			if(adj_matrix[x.id][i] > 0){
+				if(i != u_id){
+					bool is_duplicate = false;
+					for (auto v: second_orders){
+						if (v.id == i){
+							is_duplicate = true;
+							break;
+						}
+					}
+					if(!is_duplicate){
+					second_orders.push_back(vertex<T>(i, vertex_weights[i]));
+					}
+				}
+			}
+		}
+	}
+	return second_orders;
 }
 
 template <typename T>
@@ -265,7 +319,65 @@ template <typename T>
 bool directed_graph<T>::contain_cycles() const { return false; }
 
 template <typename T>
-vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id) { return vector<vertex<T>>(); }
+vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id) 
+{ 	
+	bool visited[num_vertices()]; //initialize a boolean array of num of vertices
+	stack<T> unprocessed;
+	vector<vertex<T>> ordered;
+
+	//if index of start_vertex is valid
+	if (contains(u_id)){
+		//set all index values to represent that they have not been visited yet
+		for(unsigned i=0; i < num_vertices(); i++){
+			visited[i] = false;
+		}
+		//push the start vertex id 'u' to the unprocessed stack
+		unprocessed.push(u_id);
+		//while there is still values in the unprocssed stack
+		while (!unprocessed.empty()){
+			//get the index of the top vertex and pop it from stack
+			int index = unprocessed.top();
+			unprocessed.pop();
+			//if it hasn't been visited yet
+			if(!visited[index]){
+				//set it to visited
+				visited[index] = true;
+				//add the vertex to the ordered list
+				ordered.push_back(vertex<T>(index, vertex_weights[index]));
+					//if the vertex contains a neighbour(s), push it's unvisited neighbours to the stack
+					if (out_degree(index) > 0){
+						//add it's unvisited neighbour(s) to the unprocessed stack
+						vector<vertex<T>> neighbour_list = get_neighbours(index);
+						for(vertex<T> nb : neighbour_list){
+						unprocessed.push(nb.id);
+						}
+					}
+				}
+			//if stack empty, check all unvisited vertices and go push it on stack
+			if (unprocessed.empty()){
+				for(int i=0; i < num_vertices(); i++){
+					if(visited[i] == false){
+						cout << i << endl;
+						//unprocessed.push(i);
+					}
+				}
+			}
+		}
+	}
+	return ordered; 
+}
+
+template <typename T> 
+int directed_graph<T>::get_index(const T& u) const { //get index of vertex
+	//for each vertex
+	for(int i=0; i<vertex_weights.size(); i++){
+		//if the vertex equal to the vertex we are looking for
+		if(vertex_weights[i] == u){
+			return i;
+		}
+	}
+	return 0;
+}
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::breadth_first(const int& u_id) { return vector<vertex<T>>(); }
