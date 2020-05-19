@@ -348,7 +348,55 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id)
 }
 
 template <typename T>
-vector<vertex<T>> directed_graph<T>::breadth_first(const int& u_id) { return vector<vertex<T>>(); }
+vector<vertex<T>> directed_graph<T>::breadth_first(const int& u_id) 
+{ 
+		bool visited[adj_matrix.size()];
+		queue<T> unprocessed;
+		vector<vertex<T>> ordered;
+
+		// if the index of the start_vertex is valid
+		if (contains(u_id)) {
+			// set all index values to represent that they have not been visited yet 
+			    for (unsigned i = 0; i<adj_matrix.size(); i++) {
+       				 visited[i] = false;
+    			} 
+				// add the start_vertex to the unprocessed queue
+				unprocessed.push(u_id);
+				// while there is still values in the unprocessed stack
+				while (!unprocessed.empty()){
+				// get the index of the vertex at the front of the queue and remove it
+				int index = unprocessed.front();
+				unprocessed.pop();
+				// if it hasn't been visited yet
+				if (!visited[index]){
+					// set it to visited
+					visited[index] = true;
+					// add the vertex to the ordered list
+					ordered.push_back(vertex<T>(index, vertex_weights[index]));
+					for (unsigned i = num_vertices(); i != 0; i--){
+						// if the vertex contains a neighbour
+						if (adj_matrix[index][i] != 0){
+							// add the neighbour to the end of the unprocessed queue.
+							unprocessed.push(i);
+						}
+					}
+				}
+				if(unprocessed.empty()){
+					for (int i=1;i<adj_matrix.size();i++){
+						for(int j=1;j<adj_matrix.size();j++){
+							if(adj_matrix[i][j] > 0 && visited[i] == false){
+								unprocessed.push(i);
+							}
+							if(adj_matrix[i][j] > 0 && visited[j] == false){
+								unprocessed.push(j);
+							}
+						}
+					}
+				}
+			}
+		}
+		return ordered;
+}
 
 template <typename T>
 directed_graph<T> directed_graph<T>::out_tree(const int& u_id) { return directed_graph<T>(); }
