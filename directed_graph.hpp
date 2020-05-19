@@ -1,4 +1,4 @@
-#ifndef DIRECTED_GRAPH_H
+ #ifndef DIRECTED_GRAPH_H
 #define DIRECTED_GRAPH_H
 
 #include <iostream>
@@ -40,8 +40,6 @@ public:
 
 	directed_graph(); //A constructor for directed_graph. The graph should start empty.
 	~directed_graph(); //A destructor. Depending on how you do things, this may not be necessary.
-	
-	int get_index(const T&) const; // gets the vertex's index within the adjacency matrix
 
 	void increaseCapacity();
 
@@ -272,22 +270,6 @@ vector<vertex<T>> directed_graph<T>::get_neighbours(const int& u_id) {
 template <typename T>
 vector<vertex<T>> directed_graph<T>::get_second_order_neighbours(const int& u_id) { 
 
-	/*vector<vertex<T>> first_neighbour = get_neighbours(u_id);
-	vector<vertex<T>> second_neighbour_list;
-	vector<vertex<T>> result_list;
-
-	if(contains(u_id)){ //check if vertex exists
-		for(vertex<T> nb : first_neighbour){ //for each elemnt of the first order neighbour list...
-				vector<vertex<T>> second_neighbour_list = get_neighbours(nb.id); //get the neighbour(s) of the element neighbour to achieve second order neighbour
-				for(vertex<T> yb : second_neighbour_list){ //iterate through elements of the second order neighbour list and push it in result list
-					if (yb.id != u_id){ //vertex id cannot be second order neighbour of itself
-						result_list.push_back(vertex<T>(yb.id, yb.weight));
-				}
-			}
-		}
-	}
-	return result_list;*/
-
 	vector<vertex<T>> first_orders = get_neighbours(u_id);
 	vector<vertex<T>> second_orders;
 
@@ -321,62 +303,37 @@ bool directed_graph<T>::contain_cycles() const { return false; }
 template <typename T>
 vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id) 
 { 	
-	bool visited[num_vertices()]; //initialize a boolean array of num of vertices
-	stack<T> unprocessed;
-	vector<vertex<T>> ordered;
+	stack<T>unprocessed;
+	vector<vertex<T>> visited_vertex;
+	bool visited[adj_matrix.size()];
 
-	//if index of start_vertex is valid
-	if (contains(u_id)){
-		//set all index values to represent that they have not been visited yet
-		for(unsigned i=0; i < num_vertices(); i++){
-			visited[i] = false;
-		}
-		//push the start vertex id 'u' to the unprocessed stack
-		unprocessed.push(u_id);
-		//while there is still values in the unprocssed stack
-		while (!unprocessed.empty()){
-			//get the index of the top vertex and pop it from stack
-			int index = unprocessed.top();
-			unprocessed.pop();
-			//if it hasn't been visited yet
-			if(!visited[index]){
-				//set it to visited
-				visited[index] = true;
-				//add the vertex to the ordered list
-				ordered.push_back(vertex<T>(index, vertex_weights[index]));
-					//if the vertex contains a neighbour(s), push it's unvisited neighbours to the stack
-					if (out_degree(index) > 0){
-						//add it's unvisited neighbour(s) to the unprocessed stack
-						vector<vertex<T>> neighbour_list = get_neighbours(index);
-						for(vertex<T> nb : neighbour_list){
-						unprocessed.push(nb.id);
-						}
-					}
-				}
-			//if stack empty, check all unvisited vertices and go push it on stack
-			if (unprocessed.empty()){
-				for(int i=0; i < num_vertices(); i++){
-					if(visited[i] == false){
-						cout << i << endl;
-						//unprocessed.push(i);
-					}
-				}
-			}
-		}
-	}
-	return ordered; 
-}
+    for (unsigned i = 0; i<adj_matrix.size(); i++) // Intialise all vertices in the matrix to not visited or un visited.
+    	{
+        visited[i] = false;
+    	} 
 
-template <typename T> 
-int directed_graph<T>::get_index(const T& u) const { //get index of vertex
-	//for each vertex
-	for(int i=0; i<vertex_weights.size(); i++){
-		//if the vertex equal to the vertex we are looking for
-		if(vertex_weights[i] == u){
-			return i;
-		}
-	}
-	return 0;
+	unprocessed.push(u_id);
+
+    while (!unprocessed.empty())
+    {
+        int top_stack = unprocessed.top();
+        unprocessed.pop();
+    
+        if (!visited[top_stack])
+        {
+            visited[top_stack]=true;
+            visited_vertex.push_back(vertex<T>(top_stack, vertex_weights[top_stack]));
+			//check for exsiting neighbours
+            for (unsigned i =num_vertices() ; i!= 0; i--)
+            {
+                if(adj_matrix[top_stack][i-1] != 0)
+                {
+                    unprocessed.push(i-1);
+                }
+            }
+        }
+    }
+	return visited_vertex;
 }
 
 template <typename T>
