@@ -63,7 +63,7 @@ public:
 	vector<vertex<T>> get_second_order_neighbours(const int&); // Returns a vector containing all the second_order_neighbours (i.e., neighbours of neighbours) of the given vertex.
 															  // A vector cannot be considered a second_order_neighbour of itself.
 	bool reachable(const int&,const int&); //Returns true if the second vertex is reachable from the first (can you follow a path of out-edges to get from the first to the second?). Returns false otherwise.
-	bool contain_cycles() const; // Return true if the graph contains cycles (there is a path from any vertices directly/indirectly to itself), false otherwise.
+	bool contain_cycles(); // Return true if the graph contains cycles (there is a path from any vertices directly/indirectly to itself), false otherwise.
 
 	vector<vertex<T>> depth_first(const int&); //Returns the vertices of the graph in the order they are visited in by a depth-first traversal starting at the given vertex.
 	vector<vertex<T>> breadth_first(const int&); //Returns the vertices of the graph in the order they are visisted in by a breadth-first traversal starting at the given vertex.
@@ -341,8 +341,19 @@ bool directed_graph<T>::reachable(const int& u_id,const int& v_id) {
 }
 
 template <typename T>
-bool directed_graph<T>::contain_cycles() const 
+bool directed_graph<T>::contain_cycles()
 {	
+	vector<vertex<T>> a = get_vertices();
+	vector<vertex<T>> b = get_vertices();
+	for (vertex<T> v : a){
+		for (vertex<T> z : b){
+			if ((v.id != z.id)){
+				if(reachable(v.id,z.id) && reachable(z.id,v.id)){
+					return true;
+				}
+			}
+		}
+	}
 	return false;
 }
     
