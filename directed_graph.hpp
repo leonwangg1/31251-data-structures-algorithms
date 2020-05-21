@@ -15,7 +15,6 @@
 
 using namespace std; 
 
-
 template <typename T>
 class vertex {
 
@@ -63,7 +62,7 @@ public:
 	vector<vertex<T>> get_neighbours(const int&); //Returns a vector containing all the vertices reachable from the given vertex. The vertex is not considered a neighbour of itself.
 	vector<vertex<T>> get_second_order_neighbours(const int&); // Returns a vector containing all the second_order_neighbours (i.e., neighbours of neighbours) of the given vertex.
 															  // A vector cannot be considered a second_order_neighbour of itself.
-	bool reachable(const int&, const int&) const; //Returns true if the second vertex is reachable from the first (can you follow a path of out-edges to get from the first to the second?). Returns false otherwise.
+	bool reachable(const int&,const int&); //Returns true if the second vertex is reachable from the first (can you follow a path of out-edges to get from the first to the second?). Returns false otherwise.
 	bool contain_cycles() const; // Return true if the graph contains cycles (there is a path from any vertices directly/indirectly to itself), false otherwise.
 
 	vector<vertex<T>> depth_first(const int&); //Returns the vertices of the graph in the order they are visited in by a depth-first traversal starting at the given vertex.
@@ -295,11 +294,58 @@ vector<vertex<T>> directed_graph<T>::get_second_order_neighbours(const int& u_id
 }
 
 template <typename T>
-bool directed_graph<T>::reachable(const int& u_id, const int& v_id) const { return false; }
+bool directed_graph<T>::reachable(const int& u_id,const int& v_id) { 
+
+	bool visited[num_vertices()]; //initialize a boolean array of num of vertices
+	stack<T> unprocessed;
+	vector<vertex<T>> ordered;
+
+	//if index of start_vertex is valid
+	if (contains(u_id && v_id)){
+		//set all index values to represent that they have not been visited yet
+		for(unsigned i=0; i < num_vertices(); i++){
+			visited[i] = false;
+		}
+		//push the start vertex id 'u' to the unprocessed stack
+		unprocessed.push(u_id);
+		//while there is still values in the unprocssed stack
+		while (!unprocessed.empty()){
+			//get the index of the top vertex and pop it from stack
+			int index = unprocessed.top();
+			unprocessed.pop();
+			//if it hasn't been visited yet
+			if(!visited[index]){
+				//set it to visited
+				visited[index] = true;
+				//add the vertex to the ordered list
+				ordered.push_back(vertex<T>(index, vertex_weights[index]));
+					//if the vertex contains a neighbour(s), push it's unvisited neighbours to the stack
+					if (out_degree(index) > 0){
+						//add it's unvisited neighbour(s) to the unprocessed stack
+						vector<vertex<T>> neighbour_list = get_neighbours(index);
+						for(vertex<T> nb : neighbour_list){
+						unprocessed.push(nb.id);
+						}
+					}
+				}
+			if(unprocessed.empty()){ //modified where all dfs wont traverse all nodes just the given neighbours of u_id.
+				for(vertex<T> v : ordered){
+					if(v.id == v_id){
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
 
 template <typename T>
-bool directed_graph<T>::contain_cycles() const { return false; }
-
+bool directed_graph<T>::contain_cycles() const 
+{	
+	return false;
+}
+    
 template <typename T>
 vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id) 
 { 	
