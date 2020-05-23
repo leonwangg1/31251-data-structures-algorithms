@@ -456,7 +456,79 @@ vector<vertex<T>> directed_graph<T>::breadth_first(const int& u_id)
 }
 
 template <typename T>
-directed_graph<T> directed_graph<T>::out_tree(const int& u_id) { return directed_graph<T>(); }
+directed_graph<T> directed_graph<T>::out_tree(const int& u_id) { 
+	/* 1. Contains no cycle 
+	   2. Contains all vertices and all connect 
+	   3. Edges = n - 1; where n is num of vertices 
+	   4. All vertices reachable from root (doesn't need to contain all vertices)
+	   5. Each vertex in tree will have 0, 1 2 out-edges only */
+	   
+	stack<T>unprocessed;
+	vector<vertex<T>> visited_vertex;
+	bool visited[adj_matrix.size()];
+
+	directed_graph<T> stree;
+	int iteration = 0;
+	vector<T> arr_v;
+	int n = 0;
+	int limit = 0;
+	int start = 0;
+
+	// Intialise all vertices in the matrix to not visited or un visited.
+    for (unsigned i = 0; i<adj_matrix.size(); i++) {
+        visited[i] = false;
+    	} 
+
+	unprocessed.push(u_id);
+
+    while (!unprocessed.empty())
+    {
+        int top_stack = unprocessed.top();
+        unprocessed.pop();
+    
+        if (!visited[top_stack])
+        {
+            visited[top_stack]=true;
+            visited_vertex.push_back(vertex<T>(top_stack, vertex_weights[top_stack]));
+			stree.add_vertex(vertex<T>(top_stack, vertex_weights[top_stack]));
+			arr_v.push_back(top_stack);
+			iteration += 1;
+
+			if(iteration > 1){
+				//everytime we add a vertex, we want to add a edge between the two pair of vertices, this ensures edges = n - 1.
+				T & prev = arr_v[n];
+				if(reachable(prev,top_stack)==true && (adj_matrix[prev][top_stack] > 0)){
+					stree.add_edge(prev, top_stack, adj_matrix[prev][top_stack]);
+					n+=1;
+				}
+				if(stree.num_vertices()-1 != stree.num_edges()){
+					for(vertex<T> v : stree.get_vertices()){
+						if(stree.reachable(u_id,v.id) == false && reachable(u_id,v.id)){ //if vertex on tree not reachable from root but reachable in graph root, add edge to reach
+								//fix below
+								limit += 1;
+								for(T w : arr_v){
+									if(adjacent(w,v.id) && (start < limit) && (stree.out_degree(w)< 3)){
+										stree.add_edge(w,v.id, adj_matrix[w][v.id]);
+										start += 1;
+									}
+								}
+							}
+						}
+					}
+				}
+
+			//check for exsiting neighbours
+            for (unsigned i =num_vertices() ; i!= 0; i--)
+            {
+                if(adj_matrix[top_stack][i] != 0)
+                {
+                    unprocessed.push(i);
+                }
+            }
+        }
+	}
+	return stree;
+}
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int& u_id, directed_graph<T>& mst) { return vector<vertex<T>>(); }
