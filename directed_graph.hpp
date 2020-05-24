@@ -144,8 +144,7 @@ bool directed_graph<T>::contains(const int& u_id) const {
 template <typename T>
 bool directed_graph<T>::adjacent(const int& u_id, const int& v_id) const { 
 	//if vertices are valid, return whether or not u_id contains an edge to v_id, else return false.
-	return (contains(u_id) && contains(v_id)) ? adj_matrix[u_id][v_id] > 0
-		: false;
+	return (contains(u_id) && contains(v_id)) ? adj_matrix[u_id][v_id] > 0 : false;
 }
 
 template <typename T>
@@ -180,16 +179,15 @@ void directed_graph<T>::remove_edge(const int& u_id, const int& v_id) {
 template <typename T>
 size_t directed_graph<T>::in_degree(const int& u_id) const { 
 	int total_in=0;
+	//check if vertex exist in graph
 	if(contains(u_id)){
 		for(int i=0;i<adj_matrix[u_id].size();i++){ //how much columns does row u_id contain?
-			//cout << adj_matrix[u_id][i] << endl;
 			if(adj_matrix[i][u_id] > 0){ //adj_matrix at row u_id and i column
 				total_in = total_in + 1;
 			}
 		}
-	return total_in;
 	}
-	return 0;
+	return total_in;
  }
 
 template <typename T>
@@ -197,14 +195,12 @@ size_t directed_graph<T>::out_degree(const int& u_id) const { //referencing get 
 	int total_out=0;
 	if(contains(u_id)){
 		for(int i=0;i<adj_matrix[u_id].size();i++){ //how much columns does row u_id contain?
-			//cout << adj_matrix[u_id][i] << endl;
 			if(adj_matrix[u_id][i] > 0){ //adj_matrix at row u_id and i column
 				total_out = total_out + 1;
 			}
 		}
-	return total_out;
 	}
-	return 0;
+	return total_out;
  }
 
 template <typename T>
@@ -238,21 +234,22 @@ vector<vertex<T>> directed_graph<T>::get_vertices() {
 			vertice_list.push_back(vertex<T>(i, vertex_weights[i])); // construct vertex<T> from vertex_id
 		}
 	}
-
 	return vertice_list;
 }
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::get_neighbours(const int& u_id) {
+
 	vector<vertex<T>> result;
 	vector<vertex<T>> dup;
+
 	if(contains(u_id)){ // first make sure the vertex is in the graph
 		for (int i=0; i<adj_matrix[u_id].size(); i++){
 			if(adj_matrix[u_id][i] > 0){ // check if there is an edge in that row every column
 					dup.push_back(vertex<T>(i, vertex_weights[i]));
 			}
 		}
-		//check for duplicates
+	//check for duplicates
 	  int pos = 0;
 		for (vertex<T> a : dup){
 			if(a.id == u_id){
@@ -457,6 +454,7 @@ vector<vertex<T>> directed_graph<T>::breadth_first(const int& u_id)
 
 template <typename T>
 directed_graph<T> directed_graph<T>::out_tree(const int& u_id) { 
+
 	/* 1. Contains no cycle 
 	   2. Contains all vertices and all connect 
 	   3. Edges = n - 1; where n is num of vertices 
@@ -532,14 +530,13 @@ directed_graph<T> directed_graph<T>::out_tree(const int& u_id) {
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int& u_id, directed_graph<T>& mst) { 
+	
 	stack<T>unprocessed;
 	vector<vertex<T>> visited_vertex;
 	bool visited[adj_matrix.size()];
 
-	//cout << adj_matrix[1][2]; //row i and column j return weight of 10
-
-    for (unsigned i = 0; i<adj_matrix.size(); i++) // Intialise all vertices in the matrix to not visited or un visited.
-    	{
+	// Intialise all vertices in the matrix to not visited or un visited.
+    for (unsigned i = 0; i<adj_matrix.size(); i++) {
         visited[i] = false;
     	} 
 
@@ -584,20 +581,18 @@ vector<vertex<T>> directed_graph<T>::in_order_traversal(const int& u_id, directe
 
 		//check if null
 		if (in_ord.get_neighbours(u_id).size() == 0){ 
-			return result;
+			return;
 		}
-		//get neighbours of root
-		for(int i = in_ord.adj_matrix[u_id].size(); i!=0; --i) {
-			if(in_ord.adj_matrix[u_id][i] > 0){
-				cout << i;
-			}
-		}
-		return result;
 		/*
-		inorderTraversal(n.leftChild());
+		//first recur to left child/subtree
+		in_order_traversal(n.leftChild(),in_ord);
+		
+		//then go to root
 		visit(n);
-		inorderTraversal(n.rightChild());*/
+		result.pushback(vertex<T>(n,vertex.weight[n]));
 
+		//now recur to right child
+		in_order_traversal(n.rightChild());*/
 }
 
 template <typename T>
