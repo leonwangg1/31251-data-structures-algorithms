@@ -1,4 +1,4 @@
- #ifndef DIRECTED_GRAPH_H
+#ifndef DIRECTED_GRAPH_H
 #define DIRECTED_GRAPH_H
 
 #include <iostream>
