@@ -385,9 +385,9 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id)
 			//check for exsiting neighbours
             for (unsigned i =num_vertices() ; i!= 0; i--)
             {
-                if(adj_matrix[top_stack][i-1] != 0)
+                if(adj_matrix[top_stack][i] != 0)
                 {
-                    unprocessed.push(i-1);
+                    unprocessed.push(i);
                 }
             }
         }
@@ -531,15 +531,114 @@ directed_graph<T> directed_graph<T>::out_tree(const int& u_id) {
 }
 
 template <typename T>
-vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int& u_id, directed_graph<T>& mst) { return vector<vertex<T>>(); }
+vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int& u_id, directed_graph<T>& mst) { 
+	stack<T>unprocessed;
+	vector<vertex<T>> visited_vertex;
+	bool visited[adj_matrix.size()];
+
+	//cout << adj_matrix[1][2]; //row i and column j return weight of 10
+
+    for (unsigned i = 0; i<adj_matrix.size(); i++) // Intialise all vertices in the matrix to not visited or un visited.
+    	{
+        visited[i] = false;
+    	} 
+
+	unprocessed.push(u_id);
+
+    while (!unprocessed.empty())
+    {
+        int top_stack = unprocessed.top();
+        unprocessed.pop();
+    
+        if (!visited[top_stack])
+        {
+            visited[top_stack]=true;
+            visited_vertex.push_back(vertex<T>(top_stack, vertex_weights[top_stack]));
+			//check for exsiting neighbours
+            for (unsigned i =num_vertices() ; i!= 0; i--)
+            {
+                if(adj_matrix[top_stack][i] != 0)
+                {
+                    unprocessed.push(i);
+                }
+            }
+        }
+		if(unprocessed.empty()){
+			for (int i=1;i<adj_matrix.size();i++){
+				for(int j=1;j<adj_matrix.size();j++){
+					if(adj_matrix[i][j] > 0 && visited[i] == false){
+						unprocessed.push(i);
+					}
+				}
+			}
+		}
+    }
+	return visited_vertex;
+}
 
 template <typename T>
-vector<vertex<T>> directed_graph<T>::in_order_traversal(const int& u_id, directed_graph<T>& mst) { return vector<vertex<T>>(); }
+vector<vertex<T>> directed_graph<T>::in_order_traversal(const int& u_id, directed_graph<T>& mst) { 
+
+	directed_graph<T> in_ord = out_tree(u_id);
+	vector<vertex<T>> result;
+
+		//check if null
+		if (in_ord.get_neighbours(u_id).size() == 0){ 
+			return result;
+		}
+		//get neighbours of root
+		for(int i = in_ord.adj_matrix[u_id].size(); i!=0; --i) {
+			if(in_ord.adj_matrix[u_id][i] > 0){
+				cout << i;
+			}
+		}
+		return result;
+		/*
+		inorderTraversal(n.leftChild());
+		visit(n);
+		inorderTraversal(n.rightChild());*/
+
+}
 
 template <typename T>
-vector<vertex<T>> directed_graph<T>::post_order_traversal(const int& u_id, directed_graph<T>& mst) { return vector<vertex<T>>(); }
+vector<vertex<T>> directed_graph<T>::post_order_traversal(const int& u_id, directed_graph<T>& mst) { 
+
+	/*Function postorderTraversal(Node n){
+		if (get_neighours(u_id).size() == 0){ 
+			return;
+			}
+		postorderTraversal(n.leftChild());
+		postorderTraversal(n.rightChild());
+		visit(n);
+	}*/
+}
 
 template <typename T>
-vector<vertex<T>> directed_graph<T>::significance_sorting() { return vector<vertex<T>>(); }
+vector<vertex<T>> directed_graph<T>::significance_sorting() { 
+	//Using bubble sort
+	vector<T> arrv;
+	int i, j;
+	int n = arrv.size();
+	int temp;
+	vector<vertex<T>> v = get_vertices();
+	vector<vertex<T>> sorted;
+
+	for(vertex<T> a : v){
+		arrv.push_back(a.id);
+	}
+	for(i=0;i < n-1;i++){
+		for(j=0; j < n-i-1; j++){
+			if(arrv[j] > arrv[j+1]){
+				temp = arrv[j];
+				arrv[j]=arrv[j+1];
+				arrv[j+1] = temp;
+			}
+		}
+	}
+	for(int i=0;i<arrv.size();i++){
+		sorted.push_back(vertex<T>(arrv[i],vertex_weights[arrv[i]]));
+	}
+	return sorted;
+}  
 
 #endif
