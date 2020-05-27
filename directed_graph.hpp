@@ -1,4 +1,4 @@
-#ifndef DIRECTED_GRAPH_H
+ #ifndef DIRECTED_GRAPH_H
 #define DIRECTED_GRAPH_H
 
 #include <iostream>
@@ -361,10 +361,8 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int& u_id)
 	vector<vertex<T>> visited_vertex;
 	bool visited[adj_matrix.size()];
 
-	//cout << adj_matrix[1][2]; //row i and column j return weight of 10
-
-    for (unsigned i = 0; i<adj_matrix.size(); i++) // Intialise all vertices in the matrix to not visited or un visited.
-    	{
+    // Intialise all vertices in the matrix to not visited or un visited.
+    for (unsigned i = 0; i<adj_matrix.size(); i++){
         visited[i] = false;
     	} 
 
@@ -573,39 +571,79 @@ vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int& u_id, direct
 	return visited_vertex;
 }
 
+struct Node 
+{ 
+    int data; 
+    struct Node* left;
+	struct Node* right; 
+    Node(int data) 
+    { 
+        this->data = data; 
+        left = right = NULL; 
+    } 
+}; 
+
 template <typename T>
 vector<vertex<T>> directed_graph<T>::in_order_traversal(const int& u_id, directed_graph<T>& mst) { 
+//note that tutor has specified to ensure that out_tree will produce a binary tree 
+//and also we can consider any (1 child as left or right) and (branch as left and other as right).
 
-	directed_graph<T> in_ord = out_tree(u_id);
-	vector<vertex<T>> result;
+//1. if node == null then return
+//2. then inorder(node.left)
+//3. next visit(node)
+//4. finally inorder(node.right)
 
-		//check if null
-		if (in_ord.get_neighbours(u_id).size() == 0){ 
-			return;
+	vector<vertex<T>> in_order;
+	vector<vertex<T>> mst_neighbour = mst.get_neighbours(u_id); //get mst neighbour
+	vector<vertex<T>> mst_vertices = mst.get_vertices(); //get mst vertices
+	vertex<T> *root = 0;//pointer to vertex<T> that's set to 0
+
+	for(int i=0; i<mst_vertices.size(); i++){ 
+		if(mst_vertices[i].id == u_id){
+			root = &mst_vertices[i]; 
+
+			if(mst_neighbour.size()>0){
+				vector<vertex<T>> left = in_order_traversal(mst_neighbour[0].id, mst); //adds nodes from left
+				in_order.instert(in_order.end(), left.begin(), left.end());
+			}
+
+			in_order.push_back(*root); //adds the root
+
+			if(mst_neighbour.size()>1){
+				vector<vertex<T>> right = in_order_traversal(mst_neighbour[1].id,mst);
+				in_order.insert(in_order.end(), right.begin(), right.end()); //adds nodes from right
+			}
 		}
-		/*
-		//first recur to left child/subtree
-		in_order_traversal(n.leftChild(),in_ord);
-		
-		//then go to root
-		visit(n);
-		result.pushback(vertex<T>(n,vertex.weight[n]));
-
-		//now recur to right child
-		in_order_traversal(n.rightChild());*/
+	}
+	return in_order;
 }
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::post_order_traversal(const int& u_id, directed_graph<T>& mst) { 
 
-	/*Function postorderTraversal(Node n){
-		if (get_neighours(u_id).size() == 0){ 
-			return;
+	vector<vertex<T>> post_order;
+	vector<vertex<T>> mst_neighbour = mst.get_neighbours(u_id); //get mst neighbour
+	vector<vertex<T>> mst_vertices = mst.get_vertices(); //get mst vertices
+	vertex<T> *root = 0; //pointer to vertex<T> that's set to 0
+
+	for(int i=0; i<mst_vertices.size(); i++){ 
+		if(mst_vertices[i].id == u_id){ 
+			root = &mst_vertices[i];//vertex id is passed to pointer(root) only when it matches u_id index 
+
+			if(mst_neighbour.size()>0){
+				vector<vertex<T>> left = post_order_traversal(mst_neighbour[0].id, mst); //adds nodes from left
+				post_order.instert(post_order.end(), left.begin(), left.end());
 			}
-		postorderTraversal(n.leftChild());
-		postorderTraversal(n.rightChild());
-		visit(n);
-	}*/
+
+			if(mst_neighbour.size()>1){
+				vector<vertex<T>> right = post_order_traversal(mst_neighbour[1].id,mst);
+				post_order.insert(post_order.end(), right.begin(), right.end()); //adds nodes from right
+			}
+
+			post_order.push_back(*root); //adds the root
+		}
+	}
+	return post_order;
 }
 
 template <typename T>
