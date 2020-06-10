@@ -146,7 +146,6 @@ vector<vector<vertex<T>>> tarjan(int u, int dfn[], int low[], stack<int> *s, boo
   for (vertex<T> v: g.get_neighbours(u)) { //get neighbours of u
     if (dfn[v.id] == -1){ // case1: v unvisited: : continue to search for v in depth. If not visited yet, recur for it
       tarjan(v.id, dfn, low, s, onStack, g); // recur for v
-      
       low[u] = std::min(low[u], low[v.id]); // retrospective
     } 
     else if (onStack[v.id] == true) { // case2: v visited & in stack
