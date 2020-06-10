@@ -114,5 +114,5 @@ cout << "(" << vert.id << ", " << vert.weight << ")";
 }
 cout << endl;
 
-  cout << "Low Cost Delivery: " << low_cost_delivery(g1,0); //D 
+cout << "Low Cost Delivery: " << low_cost_delivery(g1,0); //D 
 }
