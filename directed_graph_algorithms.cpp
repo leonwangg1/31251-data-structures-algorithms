@@ -92,9 +92,9 @@ vector<vertex<T>> shortest_path(directed_graph<T> g, int u_id, int v_id) {
       }
     }
     
-    /*
+    
     //TEST FUNCTION FOR DIJKSTRAS
-    for(auto elem: dijkstras){
+    /*for(auto elem: dijkstras){
       cout << elem.first << " " << elem.second << endl;
     }
     cout << "----------------------" << endl;
@@ -102,8 +102,8 @@ vector<vertex<T>> shortest_path(directed_graph<T> g, int u_id, int v_id) {
     //TEST FUNCTION FOR PREV
     for(auto elem: prev){
       cout << elem.first << " " << elem.second << endl;
-    }
-    */
+    }*/
+    
 
     //trace back path, let's say from vertex 4 (source would be 0)
     reverse.push(n);
@@ -146,6 +146,7 @@ vector<vector<vertex<T>>> tarjan(int u, int dfn[], int low[], stack<int> *s, boo
   for (vertex<T> v: g.get_neighbours(u)) { //get neighbours of u
     if (dfn[v.id] == -1){ // case1: v unvisited: : continue to search for v in depth. If not visited yet, recur for it
       tarjan(v.id, dfn, low, s, onStack, g); // recur for v
+      
       low[u] = std::min(low[u], low[v.id]); // retrospective
     } 
     else if (onStack[v.id] == true) { // case2: v visited & in stack
