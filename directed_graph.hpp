@@ -40,6 +40,10 @@ public:
 	directed_graph(); //A constructor for directed_graph. The graph should start empty.
 	~directed_graph(); //A destructor. Depending on how you do things, this may not be necessary.
 
+	int get_edgeWeight(const int&, const int&);
+	int get_vertexWeight(const int&);
+	int get_adjMatrixSize();
+
 	void increaseCapacity();
 
 	bool contains(const int&) const; //Returns true if the graph contains the given vertex_id, false otherwise.
@@ -673,5 +677,20 @@ vector<vertex<T>> directed_graph<T>::significance_sorting() {
 	}
 	return sorted;
 }  
+
+template <typename T>
+int directed_graph<T>::get_edgeWeight(const int& u, const int& v) {
+	return adj_matrix[u][v];
+}
+
+template <typename T>
+int directed_graph<T>::get_vertexWeight(const int& u) {
+	return vertex_weights[u];
+}
+
+template <typename T>
+int directed_graph<T>::get_adjMatrixSize() {
+	return adj_matrix.size();
+}
 
 #endif
