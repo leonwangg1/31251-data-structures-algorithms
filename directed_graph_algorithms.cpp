@@ -275,9 +275,19 @@ T low_cost_delivery(directed_graph<T> g, int u_id) {
   vector<int> population;
   int sumCost = 0;
   int sumPopulation = 0;
+  int out_reach = 0;
 
+  for(auto vid: g.get_vertices()){
+    if(vid.id != u_id){
+      if(g.reachable(u_id,vid.id)){
+        out_reach += 1; //only works when u_id has one delivery path
+      }
+    }
+  }
+
+if(out_reach > 0){
   for(auto a : g.get_vertices()){
-    if(a.id !=u_id){
+    if(a.id !=u_id && g.reachable(u_id,a.id)){
      result.push_back(shortest_path(g, u_id, a.id)); //return vector of shortest path from root to other node
     //check condition vv
     }
@@ -308,7 +318,8 @@ T low_cost_delivery(directed_graph<T> g, int u_id) {
     for(int n : population){
       sumPopulation += n;
     }
-  
-  return sumCost/sumPopulation;
 
+    return sumCost/sumPopulation;
+}
+  return 0;
 }
