@@ -4,7 +4,7 @@
 
 int main() {
 
-	directed_graph<int> g1;
+    directed_graph<int> g1;
 
     vertex<int> va = vertex<int>(0, 800);        //A
     vertex<int> vb = vertex<int>(1, 300);        //B
@@ -23,7 +23,7 @@ int main() {
 	vector<vertex<int>> vertex_list = g1.get_vertices();
 	cout << "all vertices: ";
 	for (vertex<int> vt : vertex_list) {
-	 	cout << "(" << vt.id << ", " << vt.weight << ") ";
+		cout << "(" << vt.id << ", " << vt.weight << ") ";
 	}
 	cout << endl;
 
@@ -58,7 +58,7 @@ int main() {
 			for (vertex<int> nb : two_neighbour_list){
 				cout <<  "(" << nb.id << ", " << nb.weight << ") ";
 			}
-			cout << endl;
+		cout << endl;
 	}
 
 	cout << "Num of vertices " << g1.num_vertices() << endl;
@@ -91,20 +91,20 @@ int main() {
 	cout << endl;
 	cout << "Is 3 reachable from 1?: " << g2.reachable(1,3) << endl;
 
-  cout << "Shortest Path" << endl;
+	cout << "Shortest Path" << endl;
     vector<vertex<int>> short_path = shortest_path(g1, 0, 4);
-    for (auto vertex : short_path) {
-            cout << "(" << vertex.id << ", " << vertex.weight << ")";
-    }
-    cout << endl;
+	for (auto vertex : short_path) {
+		cout << "(" << vertex.id << ", " << vertex.weight << ")";
+	}
+	cout << endl;
 
     cout << "Strongly Connected Components" << endl;
     vector<vector<vertex<int>>> scc = strongly_connected_components(g1);
     for (auto vector : scc) {
-        for (auto vertex : vector) {
-            cout << "(" << vertex.id << ", " << vertex.weight << ")";
-        }
-        cout << endl;
+      for (auto vertex : vector) {
+        cout << "(" << vertex.id << ", " << vertex.weight << ")";
+      }
+    cout << endl;
     }
 
     cout << "Topological Sort" << endl;
