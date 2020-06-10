@@ -18,7 +18,7 @@
 #include <optional>
 #include <exception>
 #include <stdexcept>
- 
+
 #include "directed_graph.hpp"
 
 using namespace std;
@@ -59,66 +59,68 @@ vector<vertex<T>> shortest_path(directed_graph<T> g, int u_id, int v_id) {
   stack<int> reverse;
   int n = v_id;
 
-  // Initialise all vertex distances as infinite
-	for (vertex<T> v : g.get_vertices()) {
-		dijkstras.insert(std::pair<int, int>(v.id, std::numeric_limits<int>::max()));	
-    prev.insert(std::pair<int,int>(v.id, v.id));
-	}
 
-  // Set source distance value to 0
-  dijkstras[u_id] = 0;
-
-  // Calculate how much vertices are reachable from u_id
-  for(vertex<T> j : g.get_vertices()){
-    if(g.reachable(u_id, j.id)){
-      numVertices += 1;
-    }
-  }
-
-  // Find shortest path for all vertices
-  while(spt_set.size() != numVertices){ //while spt doesn't include all the vertices that are reachable
-    // Pick the minimum distance vertex from the set of vertices not yet processed (minimum distance value vertex not in spt_set)
-    int current = min_distance(g, dijkstras, spt_set);
-    /// Mark the picked vertex as processed
-    spt_set.insert(current);
-    // update the distance value of the adjacent vertices of the picked vertex
-    for(vertex<T> n : g.get_neighbours(current)){
-       if(spt_set.count(n.id) == 0 && dijkstras[current]+g.get_edgeWeight(current, n.id) < dijkstras[n.id]){
-         dijkstras[n.id] = dijkstras[current]+g.get_edgeWeight(current, n.id);
-         prev[n.id] = current; //grab previous element of n.id
-       }
-    }
-  }
-  
-  /*
-  //TEST FUNCTION FOR DIJKSTRAS
-  for(auto elem: dijkstras){
-    cout << elem.first << " " << elem.second << endl;
-  }
-  cout << "----------------------" << endl;
-  
-  //TEST FUNCTION FOR PREV
-  for(auto elem: prev){
-    cout << elem.first << " " << elem.second << endl;
-  }
-  */
-
-  //trace back path, let's say from vertex 4 (source would be 0)
-  reverse.push(n);
-  //cout << "path test" << endl;
   if(g.reachable(u_id,v_id)){
-    while(n!= u_id){
-      n = prev.at(n);
-      reverse.push(n);
+    // Initialise all vertex distances as infinite
+    for (vertex<T> v : g.get_vertices()) {
+      dijkstras.insert(std::pair<int, int>(v.id, std::numeric_limits<int>::max()));	
+      prev.insert(std::pair<int,int>(v.id, v.id));
     }
-  }
 
-  //push vertex order path in vector
-  while(!reverse.empty()){
-    path.push_back(vertex<T>(reverse.top(),g.get_vertexWeight(reverse.top())));
-    reverse.pop();
-  }
+    // Set source distance value to 0
+    dijkstras[u_id] = 0;
 
+    // Calculate how much vertices are reachable from u_id
+    for(vertex<T> j : g.get_vertices()){
+      if(g.reachable(u_id, j.id)){
+        numVertices += 1;
+      }
+    }
+
+    // Find shortest path for all vertices
+    while(spt_set.size() != numVertices){ //while spt doesn't include all the vertices that are reachable
+      // Pick the minimum distance vertex from the set of vertices not yet processed (minimum distance value vertex not in spt_set)
+      int current = min_distance(g, dijkstras, spt_set);
+      /// Mark the picked vertex as processed
+      spt_set.insert(current);
+      // update the distance value of the adjacent vertices of the picked vertex
+      for(vertex<T> n : g.get_neighbours(current)){
+        if(spt_set.count(n.id) == 0 && dijkstras[current]+g.get_edgeWeight(current, n.id) < dijkstras[n.id]){
+          dijkstras[n.id] = dijkstras[current]+g.get_edgeWeight(current, n.id);
+          prev[n.id] = current; //grab previous element of n.id
+        }
+      }
+    }
+    
+    /*
+    //TEST FUNCTION FOR DIJKSTRAS
+    for(auto elem: dijkstras){
+      cout << elem.first << " " << elem.second << endl;
+    }
+    cout << "----------------------" << endl;
+    
+    //TEST FUNCTION FOR PREV
+    for(auto elem: prev){
+      cout << elem.first << " " << elem.second << endl;
+    }
+    */
+
+    //trace back path, let's say from vertex 4 (source would be 0)
+    reverse.push(n);
+    //cout << "path test" << endl;
+
+      while(n!= u_id){
+        n = prev.at(n);
+        reverse.push(n);
+    }
+
+    //push vertex order path in vector
+      while(!reverse.empty()){
+        path.push_back(vertex<T>(reverse.top(),g.get_vertexWeight(reverse.top())));
+        reverse.pop();
+      }
+  }
+  
   return path;
 }
 

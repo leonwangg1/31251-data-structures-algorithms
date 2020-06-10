@@ -1,4 +1,6 @@
+#include <iostream>
 #include "directed_graph.hpp"
+#include "directed_graph_algorithms.cpp"
 
 int main() {
 
@@ -97,4 +99,22 @@ int main() {
 	}
 	cout << endl;
 	cout << "Is 3 reachable from 1?: " << g2.reachable(1,3) << endl;
+
+	cout << "Shortest Path" << endl;
+    vector<vertex<int>> short_path = shortest_path(g1, 1, 4);
+    for (auto vertex : short_path) {
+            cout << "(" << vertex.id << ", " << vertex.weight << ")";
+    }
+    cout << endl;
+
+    vector<vector<vertex<int>>> scc = strongly_connected_components(g1);
+
+    cout << "Topological Sort" << endl;
+    vector<vertex<int>> top_sort = topological_sort(g1);
+    for (auto vert : top_sort) {
+        cout << "(" << vert.id << ", " << vert.weight << ")";
+    }
+    cout << endl;
+
+    cout << "Low Cost Delivery: " << low_cost_delivery(g1,1);
 }
