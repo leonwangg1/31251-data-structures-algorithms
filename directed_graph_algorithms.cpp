@@ -18,7 +18,7 @@
 #include <optional>
 #include <exception>
 #include <stdexcept>
-
+ 
 #include "directed_graph.hpp"
 
 using namespace std;
